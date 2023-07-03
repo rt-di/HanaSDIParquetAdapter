@@ -1,7 +1,4 @@
-/**
- * (c) 2017 SAP SE or an SAP affiliate company. All rights reserved.
- */
-package io.rtdi.sdiadapter.parquetadapter;
+package io.rtdi.sap.hana.sdi.parquetadapter;
 
 import com.sap.hana.dp.adapter.sdk.Adapter;
 import com.sap.hana.dp.adapter.sdk.AdapterException;
@@ -25,19 +22,16 @@ public class ParquetAdapterFactory implements AdapterFactory{
 
 	@Override
 	public String getAdapterType() {
-		// TODO Auto-generated method stub
 		return "ParquetAdapter";
 	}
 
 	@Override
 	public String getAdapterDisplayName() {
-		// TODO Auto-generated method stub
 		return "ParquetAdapter";
 	}
 
 	@Override
 	public String getAdapterDescription() {
-		// TODO Auto-generated method stub
 		return "SDI Adapter ParquetAdapter";
 	}
 	
