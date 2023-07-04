@@ -3,7 +3,7 @@
 An Adapter for SAP Hana Smart Data Integration to read any Parquet file/directory located anywhere.
 
 The adapter is based on the Hadoop client library, hence can read from local filesystem, HDFS, S3 or any other file system the Hadoop client supports.
-For local files, because a Windows installation would require the winutils.dll, the [bare naked filesystem](https://github.com/globalmentor/hadoop-bare-naked-local-fs) is used instead. This is not an ideal solution as the entire Hadoop client is 60MB in size still. On the other hand, this way not only local files are supported but cloud storage as well.
+For local files, because a Windows installation would require the winutils.dll, the [bare naked filesystem](https://github.com/globalmentor/Hadoop-bare-naked-local-fs) is used instead. This is not an ideal solution as the entire Hadoop client is 60MB in size still. On the other hand, this way not only local files are supported but cloud storage as well.
 
 It supports reading all parquet files and directories containing parquet files, including files with nested structures. In the nested case the data is "joined" by simply selecting the additional columns.
 
@@ -105,3 +105,60 @@ Then a first virtual table can be created
 and selected from
 
 <img src="_media/03select.png" width="30%">
+
+
+## Azure
+
+The adapter contains the `Hadoop-azure` and `azure-storage` libraries to connect the Hadoop client to Azure.
+
+In the example below the goal is to read this Parquet file
+
+<img src="_media/04azurefilesystem.png" width="40%">
+
+The approach to switch from the local file system to Azure is to use the `core-site.xml` of Hadoop. The adapter is reading all Hadoop configuration files from the specified directory.
+In this example the `/usr/sap/dataprovagent/bin/agentcli --configAdapters` was used to set the Hadoop conf directory to `/apps/sdi/parquet/hadoop/conf`.
+
+In this directory the `core-site.xml` is present with the contents
+
+	<?xml version="1.0"?>
+	<configuration>
+		<property>         
+			<name>fs.AbstractFileSystem.wasb.Impl</name>                           
+			<value>org.apache.hadoop.fs.azure.Wasb</value> 
+		</property>
+		<property>
+			<name>fs.azure.account.key.filesystemrtdiio.blob.core.windows.net</name>
+			<value>.....azure access key.....</value>
+		</property>
+		<property>
+			<name>fs.defaultFS</name>
+			<value>wasbs://main@filesystemrtdiio.blob.core.windows.net</value>
+		</property>
+	</configuration>
+
+which tells the Hadoop client that there is the Azure file system implementation present, the storage key needed to connect to Azure and switch the default filesystem.
+
+The `filesystemrtdiio` is the storage account name - see above Azure screen shot - and `main` is the storage container and both values are used in the xml.
+The Azure access key is found here
+
+<img src="_media/05azureaccesskey.png" width="40%">
+
+The matching remote source is - note the rooturl:
+
+	CREATE REMOTE SOURCE PARQUET_FILES ADAPTER "ParquetAdapter"
+	AT LOCATION AGENT "MYAGENT" CONFIGURATION
+	  '<?xml version="1.0" encoding="UTF-8"?>
+	  <ConnectionProperties name="connectioninfo">
+	    <PropertyEntry name="rooturl">wasbs://main@filesystemrtdiio.blob.core.windows.net/parquet</PropertyEntry>
+	  </ConnectionProperties>'
+	WITH CREDENTIAL TYPE 'PASSWORD' USING
+	  '<CredentialEntry name="credential">
+        <user>whatever</user>
+        <password>psst</password>
+	  </CredentialEntry>';
+
+and the virtual table
+
+	CREATE VIRTUAL TABLE v_address_short AT PARQUET_FILES."<NULL>"."<NULL>"."wasbs://main@filesystemrtdiio.blob.core.windows.net/parquet/address_short.parquet";
+	
+

@@ -44,8 +44,8 @@ public class ParquetAdapterFactory implements AdapterFactory{
 		hdfsurl.setDefaultValue("file:///data");
 		connectionInfo.addProperty(hdfsurl);
 		
-		PropertyEntry confdir = new PropertyEntry(CONFDIR, "directory with hadoop configuration files", "Th directory where all hadoop client configuration files are found");
-		confdir.setDefaultValue("file:///hadoop/conf");
+		PropertyEntry confdir = new PropertyEntry(CONFDIR, "directory with hadoop configuration files", "The directory where all hadoop client configuration files are found");
+		confdir.setDefaultValue("/hadoop/conf");
 		connectionInfo.addProperty(confdir);
 
 		CredentialProperties credentialProperties = new CredentialProperties();

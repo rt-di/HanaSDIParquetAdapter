@@ -107,7 +107,7 @@ public class ParquetAdapter extends Adapter {
 			if (!username.equals(adapterusername) || !password.equals(adapterpassword)) {
 				throw new AdapterException("Remote source credentials must match the configured values in the ParquetAdapter - see ./bin/agentcli --configAdapters");
 			}
-
+			
 
 			String confdir = adapterconf.getPropertyEntry(ParquetAdapterFactory.CONFDIR).getValue();
 			if (confdir != null) {
